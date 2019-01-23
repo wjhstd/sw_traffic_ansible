@@ -1,0 +1,33 @@
+global_defs {
+    router_id server_{{node_ip}}
+}
+
+
+vrrp_script check_running {
+    script /root/check.sh
+    interval 3
+}
+
+vrrp_instance VI_1 {
+    state BACKUP
+    interface {{keepalive_interface}}
+    nopreempt
+    virtual_router_id 51 # 保持主备服务器一致
+    priority 90           # 优先级 (主服务器应比备份服务器高)
+    advert_int 1           # 心跳广播时间间隔(秒)
+
+    notify_master "/root/notify.sh master"
+    notify_backup "/root/notify.sh backup"
+    notify_fault "/root/notify.sh fault"
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        {{keepalive_vip}}
+    } 
+
+   track_script {
+       check_running
+   }
+} 

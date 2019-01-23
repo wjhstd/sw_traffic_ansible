@@ -1,0 +1,23 @@
+---
+- hosts: master,backup
+  gather_facts: false
+  tasks:
+  - name: gluster
+    gluster_volume:
+            state: present
+            name: data
+            bricks: /data1/brick
+            replicas: 2
+            cluster:
+            - 10.28.1.25
+            - 10.28.1.28
+            force: true
+    tags:
+    - master
+
+  - name: mount data
+    mount: path=/data src=localhost:data state=mounted fstype=glusterfs 
+    tags:
+    - master
+    - backup
+

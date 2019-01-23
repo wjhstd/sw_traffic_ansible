@@ -1,0 +1,109 @@
+- name: forbidden kernel update
+  template: src=10periodic.j2 dest=/etc/apt/apt.conf.d/10periodic
+  tags:
+  - single
+  - master
+  - backup
+
+- name: load nvidia-uvm on boot time
+  template: src=modules dest=/etc/modules
+  tags:
+  - single
+  - master
+  - backup
+
+- name: deploy logrotate configuration
+  template: src=jserver dest=/etc/logrotate.d/
+  tags:
+  - single
+  - master
+  - backup
+
+- name: optimize kernel 
+  sysctl: name={{item.key}} value={{item.value}} state=present
+  with_items:
+  - { key: "net.core.wmem_default",value: "2097152" }
+  - { key: "net.core.wmem_max",value: "2097152" }
+  - { key: "net.core.rmem_default",value: "2097152" }
+  - { key: "net.core.rmem_max",value: "2097152" }
+  tags:
+  - single
+  - master
+  - backup
+
+- name: deploy data clean
+  template: src=clear_cdn_data dest=/etc/cron.daily/ mode='0755'
+  tags:
+  - single
+  - master
+  - backup
+
+- name: create {{data_dir}}
+  file: path={{data_dir}} state=directory
+  tags:
+  - single
+  - master
+  - backup
+    
+# cost much time,please copy files manually local [common/files/node] -> remote [/tmp/]
+- name: copy software to target
+  copy: src=node dest={{data_dir}}
+  tags:
+  - single1
+  - master
+  - backup
+
+- name: install pkgs for nvidia driver
+  shell: dpkg -i /{{data_dir}}/node/pkgs/*.deb
+  tags:
+  - single
+  - master
+  - backup
+  ignore_errors: true
+
+- name: install nvidia-driver
+  shell: /{{data_dir}}/node/NVIDIA-Linux-x86_64-390.25.run -s 
+  tags:
+  - single
+  - master
+  - backup
+
+- name: load nvidia-uvm with no boot
+  shell: modprobe nvidia-uvm
+  tags:
+  - single
+  - master
+  - backup
+
+- name: install docker-ce 
+  shell: dpkg -i {{data_dir}}/node/docker/*
+  tags:
+  - single
+  - master
+  - backup
+
+ 
+- name: install nvidia-docker
+  shell: /{{data_dir}}/node/nvidiadocker.sh -s 
+  tags:
+  - single
+  - master
+  - backup 
+
+  
+- name: import docker images
+  shell: docker load < {{data_dir}}/node/images/{{item}}
+  with_items:
+  - hightf.tar
+  tags:
+  - single
+  - master
+  - backup
+
+
+- name: clear environment
+  file: path={{data_dir}} state=absent
+  tags:
+  - single1
+  - master
+  - backup

@@ -1,0 +1,34 @@
+---
+- hosts: test
+  gather_facts: false
+  tasks:
+  - name: mkdir data1
+    file: path=/data1 state=directory
+  
+  - name: create brick
+    file: path=/data1/brick state=directory
+
+  - name: create glusterfs tmp dir
+    file: path=/tmp/ha state=directory
+
+  - name: copy files to remote target
+    unarchive: src=ha.tgz dest=/tmp/ha/
+
+  - name: install python2.7
+    shell: dpkg -i /tmp/ha/python2.7/*.deb 
+
+  - name: install keepalived
+    shell: dpkg -i /tmp/ha/keepalived/*.deb 
+
+  - name: install glusterfs python pkg
+    shell: dpkg -i /tmp/ha/glusterfs/python*.deb
+    ignore_errors: true
+
+  - name: install glusterfs
+    shell: dpkg -i /tmp/ha/glusterfs/*.deb
+
+
+  - name: clear
+    file: path=/tmp/ha state=absent
+
+ 

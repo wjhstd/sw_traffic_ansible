@@ -1,0 +1,47 @@
+---
+- name: modify hostname to {{hostname}}
+  shell: hostnamectl set-hostname {{hostname}}
+  tags:
+  - single
+
+- name: add hostname to hosts
+  shell: echo "127.0.0.1 {{hostname}}" >> /etc/hosts
+  tags:
+  - single
+
+- name: mkfs on {{data_device}}
+  filesystem: dev={{data_device}} fstype={{fstype}}
+  tags:
+  - single
+
+
+- name: mount /data
+  mount: path=/data src={{data_device}} state=mounted fstype={{fstype}}
+  tags:
+  - single
+
+- name: init ip
+  template: src=ifconfig.conf.j2 dest=/data/ifconfig.conf
+  tags:
+  - single
+
+- name: create mysql dir
+  unarchive: dest=/data/ src=mysql.tgz
+  tags:
+  - single
+
+- name: start JServer
+  shell: docker run -d --network=host -v /data/mysql:/var/lib/mysql -v /data:/data  --name=jserver --restart=always shiwu/jserver
+  tags:
+  - single
+
+- name: start JEncoder
+  shell: docker run -d --network=host --name=jencoder -v /data:/data --privileged=true --restart=always shiwu/jencoder
+  tags:
+  - single
+
+- name: init env
+  script: init.sh 
+  tags:
+  - single1
+

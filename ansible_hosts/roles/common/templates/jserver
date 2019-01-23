@@ -1,0 +1,48 @@
+/data/log/*.log
+/data/syslog/crm/*.log
+/data/syslog/lcm/*log
+/data/syslog/lrm/*.log
+/data/syslog/userver/*.log
+/data/syslog/ccm/*.log{
+    daily
+    rotate 0
+    compress
+    copytruncate
+    ifempty
+    postrotate
+        ls /data/log/JEncoder.log_* > /dev/null 2>&1 
+        if [ $? -eq 0 ];then
+            rm /data/log/JEncoder.log_*
+        fi
+
+        ls /data/syslog/crm/crm.log.*[^z] > /dev/null 2>&1 
+        if [ $? -eq 0 ];then
+            rm /data/syslog/crm/crm.log.*[^z]
+        fi
+
+        ls /data/syslog/ccm/ccm.log.*[^z] > /dev/null 2>&1 
+        if [ $? -eq 0 ];then
+            rm /data/syslog/ccm/ccm.log.*[^z]
+        fi
+
+        ls /data/syslog/lrm/lrm.log.*[^z] > /dev/null 2>&1 
+        if [ $? -eq 0 ];then
+            rm /data/syslog/lrm/lrm.log.*[^z]
+        fi
+
+        ls /data/syslog/lcm/lcm.log.*[^z] > /dev/null 2>&1 
+        if [ $? -eq 0 ];then
+            rm /data/syslog/lcm/lcm.log.*[^z]
+        fi
+
+        ls /data/log/JServer.2018* > /dev/null 2>&1 
+        if [ $? -eq 0 ];then
+            rm /data/log/JServer.2018*
+        fi
+
+        ls /data/syslog/userver/UServerHawk.log-* > /dev/null 2>&1 
+        if [ $? -eq 0 ];then
+            rm /data/syslog/userver/UServerHawk.log-*
+        fi
+    endscript
+}

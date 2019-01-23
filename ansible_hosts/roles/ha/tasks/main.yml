@@ -1,0 +1,40 @@
+---
+
+- name: copy keepalive configure files to target
+  template: src=keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf
+  notify:
+  - restart keepalived
+  tags:
+  - master
+  - backup
+ 
+- name: create data volume with replicas 2 
+  gluster_volume: bricks=/data1/brick name=data replicas=2 cluster=[master,backup] state=present force=true 
+  tags:
+  - master
+
+- name: mount gluster volume
+  mount: path=/data src=localhost:data state=mounted fstype=glusterfs
+  tags:
+  - master
+  - backup
+
+- name: init vip
+  template: src=ifconfig.conf.j2 dest=/data/ifconfig
+  tags:
+  - master
+
+- name: init mysql dir
+  file: path=/data/mysql state=directory
+  tags:
+  - master
+
+- name: start JServer
+  shell: docker run -d --name=jserver --network=host -v /data/mysql:/var/lib/mysql --restart=always shiwu/jserver
+  tags:
+  - master
+  - backup
+
+
+
+

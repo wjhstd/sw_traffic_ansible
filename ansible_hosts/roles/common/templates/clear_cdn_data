@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+DataKeepNums=300
+DataKeepUnit="MIN" #DAY or MIN
+
+CheckDiskUsage=true
+DiskUsage=80
+
+
+
+[ -d /data/contents ] || exit 1
+
+
+if  $CheckDiskUsage ;then
+    disk_usage=$(df -h|awk '/data/{print $5}'|tr -d '%')
+    [ $disk_usage -lt $DiskUsage ] && exit 0
+fi
+
+if [ $DataKeepUnit == "DAY" ];then
+    timeopt="-mtime"
+else
+    timeopt="-mmin"
+fi
+
+for i in $(find /data/contents -type f $timeopt +$DataKeepNums)
+do
+    rm $i
+    echo $(date) $i >> /tmp/cdn_delete.log
+done
+
+

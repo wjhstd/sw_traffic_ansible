@@ -1,0 +1,12 @@
+[node]
+172.30.81.201 ansible_ssh_user=root ansible_ssh_pass=1 node_ip=172.30.81.201 data_device=/dev/mdb
+
+[node:vars]
+keepalive_vip=172.30.81.200
+ansible_python_interpreter=/usr/bin/python3
+
+[master]
+10.10.21.86 keepalive_interface=enp5s0f0 backup=10.10.21.88
+
+[backup]
+10.10.21.88 keepalive_interface=eth0 master=172.30.81.201
