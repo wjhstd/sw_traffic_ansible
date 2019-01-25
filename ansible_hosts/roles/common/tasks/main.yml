@@ -86,7 +86,7 @@
 - name: install nvidia-docker
   shell: /{{data_dir}}/node/nvidiadocker.sh -s 
   tags:
-  - single
+  - single1
   - master
   - backup 
 
