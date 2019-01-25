@@ -1,5 +1,5 @@
 ---
-- hosts: 172.30.81.200
+- hosts: all
   gather_facts: false
 
   roles:
