@@ -78,7 +78,7 @@
 - name: install docker-ce 
   shell: dpkg -i {{data_dir}}/node/docker/*
   tags:
-  - single
+  - single1
   - master
   - backup
 
