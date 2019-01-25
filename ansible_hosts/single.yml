@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: node
   gather_facts: false
 
   roles:
