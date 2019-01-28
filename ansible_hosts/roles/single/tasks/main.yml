@@ -10,7 +10,8 @@
   - single
 
 - name: start hightf
-  shell: nvidia-docker run -d -e SERVER_IP=172.30.81.200 -e CLIENT_IP=172.30.20.164 -e CLIENT_PORT=8091 --network=host  --name=high_tra --restart=always shiwu/hightf:4.1
+  shell: nvidia-docker run -d -e SERVER_IP=172.30.81.200 -e CLIENT_IP=172.30.20.164 -e CLIENT_PORT={{item}} --network=host  --name=high_tra{{item}} --restart=always shiwu/hightf:4.1
+  with_sequence: start=8091 end=8094 stride=1
   tags:
   - single
 
